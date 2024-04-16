@@ -50,6 +50,14 @@ jobs:
           region = ${{ vars.AWS_REGION }}
           EOF
 
+          docker stop calculator
+
           ECR_TOKEN=$(aws ecr get-login-password --region ${{ vars.AWS_REGION }})
           docker login -u AWS -p $ECR_TOKEN ${{ vars.ECR_URL }}
-          docker run --pull=always -p 80:8000 ${{ vars.ECR_URL }}:${{ github.event.inputs.tag }}
+          docker run \
+          -d \
+          --rm \
+          --pull=always \
+          -p 80:8000 \
+          --name calculator
+          ${{ vars.ECR_URL }}:${{ github.event.inputs.tag }}
