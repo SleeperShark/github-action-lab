@@ -47,9 +47,9 @@ jobs:
 
           cat << EOF > ~/.aws/config
           [default]
-          region = ap-northeast-1
+          region = ${{ vars.AWS_REGION }}
           EOF
 
-          ECR_TOKEN=$(aws ecr get-login-password --region ap-northeast-1)
+          ECR_TOKEN=$(aws ecr get-login-password --region ${{ vars.AWS_REGION }})
           docker login -u AWS -p $ECR_TOKEN ${{ vars.ECR_URL }}
-          docker run --pull=always ${{ vars.ECR_URL }}:${{ github.event.inputs.tag }} -p 80:8000
+          docker run --pull=always -p 80:8000 ${{ vars.ECR_URL }}:${{ github.event.inputs.tag }}
