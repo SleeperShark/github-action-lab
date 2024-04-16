@@ -12,20 +12,20 @@ on:
         - build-test
 
 jobs:
-#   discord-notification:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Send Deploy Approval Request to Discord
-#       run: |
-#         curl \
-#         -H "Content-Type: application/json" \
-#         -X POST \
-#         -d '{"content": "Deploy Approval Request: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
-#         ${{ vars.DISCORD_WEBHOOK_URL }}
+  discord-notification:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Send Deploy Approval Request to Discord
+      run: |
+        curl \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d '{"content": "Deploy Approval Request: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+        ${{ vars.DISCORD_WEBHOOK_URL }}
 
   deploy:
     runs-on: ubuntu-latest
-    # needs: discord-notification
+    needs: discord-notification
     environment: dev
     steps:
     - name: executing remote ssh commands using ssh key
