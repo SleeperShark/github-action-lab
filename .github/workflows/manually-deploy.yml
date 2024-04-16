@@ -28,7 +28,7 @@ jobs:
     needs: discord-notification
     environment: dev
     steps:
-    - name: executing remote ssh commands using ssh key
+    - name: Deploy Calculator Through ssh-action
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.INSTANCE_HOST }}
