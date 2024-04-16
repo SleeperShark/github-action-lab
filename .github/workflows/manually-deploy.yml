@@ -60,5 +60,5 @@ jobs:
           --rm \
           --pull=always \
           -p 80:8000 \
-          --name $COTAINER_NAME
+          --name $COTAINER_NAME \
           ${{ vars.ECR_URL }}:${{ github.event.inputs.tag }}
