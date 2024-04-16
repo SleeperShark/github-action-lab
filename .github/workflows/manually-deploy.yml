@@ -33,10 +33,24 @@ jobs:
 
     - name: executing remote ssh commands using ssh key
       uses: appleboy/ssh-action@v1.0.3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
       with:
         host: ${{ secrets.INSTANCE_HOST }}
         username: ${{ secrets.INSTANCE_USERNAME }}
         key: ${{ secrets.INSTANCE_SSH_KEY }}
         port: ${{ secrets.INSTANCE_PROT }}
-        script: whoami
+        script: |
+          cat << EOF > ~/.aws/credentials
+          [default]
+          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY_ID}
+          EOF
 
+          cat << EOF > ~/.aws/config
+          [default]
+          region = ap-northeast-1
+          EOF
+
+          aws ecr get-login-password --region ap-northeast-1
