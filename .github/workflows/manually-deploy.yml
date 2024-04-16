@@ -16,5 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Echo Tag
-      run: echo "${{ github.event.inputs.tag }}"
+    - name: Send Deploy Notification to Discord
+      run: |
+        curl \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d '{"message": "Deploy Approval Request", "actionUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' \
+        ${{ vars.DISCORD_WEBHOOK_URL }}
