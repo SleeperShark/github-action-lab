@@ -1,0 +1,20 @@
+name: Manually Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: choice
+        description: image tag to deploy
+        required: true
+        options: 
+        - task-D
+        - build-test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Echo Tag
+      run: echo "${{ github.event.inputs.tag }}"
