@@ -2,7 +2,10 @@ name: task-6-2-apply-after-merge
 
 on:
   push:
-    branches: ["task-6-2-D"]
+    branches: ["main"]
+    paths:
+    - 'task-6-2/src/**'
+
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -25,8 +28,8 @@ jobs:
     needs: discord-notification
     environment: task-6-2
     outputs:
-        instance-id: ${{ steps.terraform_apply.outputs.INSTANCE_ID }}
-        instance-public-ip: ${{ steps.terraform_apply.outputs.INSTANCE_PUBLIC_IP }}
+        instance_id: ${{ steps.terraform_output.outputs.instance_id }}
+        instance_public_ip: ${{ steps.terraform_output.outputs.instance_public_ip }}
     defaults:
       run:
         working-directory: task-6-2/src
@@ -39,7 +42,7 @@ jobs:
         role-to-assume: ${{ vars.TASK_6_2_GITHUB_ACTION_IAM_ARN }}
         aws-region: ap-northeast-1
     
-    - uses: hashicorp/setup-terraform@v2
+    - uses: hashicorp/setup-terraform@v3
 
     - name: Terraform Init
       run: terraform init
@@ -49,18 +52,30 @@ jobs:
 
     - id: terraform_apply
       name: Terraform Apply
+      run: terraform apply -auto-approve
+
+    - id: terraform_output
+      name: Terraform output
       run: |
-        terraform apply -auto-approve
-        echo "INSTANCE_PUBLIC_IP=$(terraform output -raw instance_public_ip )" >> "$GITHUB_OUTPUT"
-        echo "INSTANCE_ID=$(terraform output -raw instance_id)" >> "$GITHUB_OUTPUT"
+        instance_public_ip=$(terraform output -raw instance_public_ip)
+        instance_id=$(terraform output -raw instance_id)
+        echo "instance_public_ip=$instance_public_ip" >> "$GITHUB_OUTPUT"
+        echo "instance_id=$instance_id" >> "$GITHUB_OUTPUT"
 
     - name: Terraform Destroy
       if: failure()
       run: terraform destroy -auto-approve
 
-  ssh-test:
+  ssh-access:
     runs-on: ubuntu-latest
     needs: apply
     steps:
-    - run: |
-        echo ${{needs.apply.outputs.instance-public-ip}} ${{needs.apply.outputs.instance-id}}
+    - name: Executing Remote SSH Commands
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ needs.apply.outputs.instance_public_ip }}
+        username: ${{ secrets.TASK_6_2_USERNAME }}
+        key: ${{ secrets.TASK_6_2_SSH_PRIVATE_KEY }}
+        port: ${{ secrets.TASK_6_2_PORT }}
+        script: |
+          echo "Hello World" > ~/hello.txt
