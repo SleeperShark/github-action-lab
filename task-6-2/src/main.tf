@@ -98,10 +98,6 @@ resource "aws_security_group" "public_sg" {
   }
 }
 
-resource "tls_private_key" "ssh_key" {
-  algorithm = "ED25519"
-}
-
 resource "aws_instance" "main" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
