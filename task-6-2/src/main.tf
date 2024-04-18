@@ -122,3 +122,7 @@ output "instance_public_ip" {
 output "instance_id" {
   value = aws_instance.main.id
 }
+
+output "silly_outout" {
+    value = "NOTHING BUT FOR MODIFICATION TRIGGER"
+}
